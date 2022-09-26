@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import { useForm, useWatch } from "react-hook-form";
 import { Disclosure, Transition } from "@headlessui/react";
-import HCaptcha from "@hcaptcha/react-hcaptcha";
 
 export default function PopupWidget() {
 	const {
@@ -233,13 +232,6 @@ export default function PopupWidget() {
 													</div>
 												)}
 											</div>
-
-											<HCaptcha
-												sitekey="67c3b64d-8e32-4694-9148-4b6930b8e786"
-												onVerify={(token, ekey) =>
-													handleVerificationSuccess(token, ekey)
-												}
-											/>
 
 											<div className="mb-3">
 												<button
