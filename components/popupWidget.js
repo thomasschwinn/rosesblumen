@@ -129,7 +129,7 @@ export default function PopupWidget() {
 											/>
 											<input
 												type="hidden"
-												value={`${userName} sent a message from Nextly`}
+												value={`${userName} hat eine Email von rosesblumen.com geschickt`}
 												{...register("subject")}
 											/>
 											<input

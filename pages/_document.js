@@ -42,6 +42,10 @@ class MyDocument extends Document {
 				<body>
 					<Main />
 					<NextScript />
+					<script>
+						function handleVerificationSuccess()
+						{console.log("das hat funktioniert")}
+					</script>
 				</body>
 			</Html>
 		);
