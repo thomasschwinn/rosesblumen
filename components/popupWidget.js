@@ -232,6 +232,10 @@ export default function PopupWidget() {
 													</div>
 												)}
 											</div>
+											<div
+												className="h-captcha h-12"
+												data-sitekey="67c3b64d-8e32-4694-9148-4b6930b8e786"
+											></div>
 											<div className="mb-3">
 												<button
 													type="submit"
