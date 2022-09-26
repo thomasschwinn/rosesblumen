@@ -17,7 +17,7 @@ export default function Hero() {
 					/>
 					<h2>Frische Blumen</h2>
 					<h3>ab 5. Oktober, mittwochs ab 14 Uhr am Volkertmarkt</h3>
-					<h3>freitags und samstags von 8- 14 Uhr am Karmelitermarkt</h3>
+					<h3>freitags und samstags von 8 - 14 Uhr am Karmelitermarkt</h3>
 				</div>
 
 				<Image layout="responsive" src={standImg}></Image>
