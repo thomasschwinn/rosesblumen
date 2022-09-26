@@ -3,37 +3,37 @@ import React from "react";
 import Container from "./container";
 
 export default function Footer() {
-	const navigation = ["Product", "Features", "Pricing", "Company", "Blog"];
-	const legal = ["Terms", "Privacy", "Legal"];
+	// const navigation = ["Product", "Features", "Pricing", "Company", "Blog"];
+	// const legal = ["Terms", "Privacy", "Legal"];
 	return (
-		<div className="relative">
-			<Container>
-				<div className="grid max-w-screen-xl grid-cols-1 gap-10 pt-10 mx-auto mt-5 border-t border-gray-100 dark:border-trueGray-700 lg:grid-cols-5">
-					<div className="lg:col-span-2">
-						<div>
-							{" "}
-							<Link href="/">
-								<a className="flex items-center space-x-2 text-2xl font-medium text-indigo-500 dark:text-gray-100">
-									<span>
-										<img
-											src="/img/roses-blumen-logo.svg"
-											alt="N"
-											width="32"
-											height="32"
-											className="w-32"
-										/>
-									</span>
-								</a>
-							</Link>
-						</div>
-
-						<div className="max-w-md mt-4 text-gray-500 dark:text-gray-400">
-							Rosesblumen ist ein Marktstand mit frischen Schnittblumen am
-							Karmeliter- und am Volkertmarkt in 1020 Wien.
-						</div>
+		// <div className="relative">
+		<Container>
+			<div className="grid max-w-screen-xl grid-cols-1 gap-10 pt-10 mx-auto mt-5 border-t border-gray-100 dark:border-trueGray-700 lg:grid-cols-5">
+				<div className="lg:col-span-2">
+					<div>
+						{" "}
+						<Link href="/">
+							<a className="flex items-center space-x-2 text-2xl font-medium text-indigo-500 dark:text-gray-100">
+								<span>
+									<img
+										src="/img/roses-blumen-logo.svg"
+										alt="N"
+										width="32"
+										height="32"
+										className="w-32"
+									/>
+								</span>
+							</a>
+						</Link>
 					</div>
 
-					<div>
+					<div className="max-w-md mt-4 text-gray-500 dark:text-gray-400">
+						Rosesblumen ist ein Marktstand mit frischen Schnittblumen am
+						Karmeliter- und am Volkertmarkt in 1020 Wien.
+					</div>
+				</div>
+
+				{/* <div>
 						<div className="flex flex-wrap w-full -mt-2 -ml-3 lg:ml-0">
 							{navigation.map((item, index) => (
 								<Link key={index} href="/">
@@ -54,11 +54,12 @@ export default function Footer() {
 								</Link>
 							))}
 						</div>
-					</div>
-					<div className="">
-						<div>Hier können Sie mir auf Social Media Folgen</div>
-						<div className="flex mt-5 space-x-5 text-gray-400 dark:text-gray-500">
-							{/* <a
+					</div> */}
+				<div></div>
+				<div className="lg:col-span-2">
+					<div>Hier können Sie mir auf Social Media Folgen</div>
+					<div className="flex mt-5 space-x-5 text-gray-400 dark:text-gray-500">
+						{/* <a
 								href="https://twitter.com/web3templates"
 								target="_blank"
 								rel="noopener"
@@ -66,34 +67,38 @@ export default function Footer() {
 								<span className="sr-only">Twitter</span>
 								<Twitter />
 							</a> */}
-							<a
-								href="https://m.facebook.com/rosesblumen"
-								target="_blank"
-								rel="noopener"
-							>
-								<span className="sr-only">Facebook</span>
-								<Facebook />
-							</a>
-							<a
-								href="https://www.instagram.com/rosesblumen/"
-								target="_blank"
-								rel="noopener"
-							>
-								<span className="sr-only">Instagram</span>
-								<Instagram />
-							</a>
-						</div>
+						<a
+							href="https://m.facebook.com/rosesblumen"
+							target="_blank"
+							rel="noopener"
+						>
+							<span className="sr-only">Facebook</span>
+							<Facebook />
+						</a>
+						<a
+							href="https://www.instagram.com/rosesblumen/"
+							target="_blank"
+							rel="noopener"
+						>
+							<span className="sr-only">Instagram</span>
+							<Instagram />
+						</a>
 					</div>
 				</div>
-
-				<div className="my-10 text-sm text-center text-gray-600 dark:text-gray-400">
-					Copyright © {new Date().getFullYear()}. Made with ♥ by{" "}
-					<a href="https://schwinn.cc/" target="_blank" rel="noopener">
-						Thomas Schwinn.
-					</a>
+				<div className=" text-sm text-center text-gray-600 dark:text-gray-400 lg:col-span-5">
+					Rose Mwende Schwinn, Franz-Hochedlinger-Gasse 9/8, 1020 wien, +43 699
+					18200580, hallo@rosesblumen.com
 				</div>
-			</Container>
-		</div>
+			</div>
+
+			<div className="my-10 text-sm text-center text-gray-600 dark:text-gray-400">
+				Copyright © {new Date().getFullYear()}. Made with ♥ by{" "}
+				<a href="https://schwinn.cc/" target="_blank" rel="noopener">
+					Thomas Schwinn.
+				</a>
+			</div>
+		</Container>
+		// </div>
 	);
 }
 
