@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useForm, useWatch } from "react-hook-form";
 import { Disclosure, Transition } from "@headlessui/react";
+import HCaptcha from "@hcaptcha/react-hcaptcha";
 
 export default function PopupWidget() {
 	const {
@@ -109,7 +110,7 @@ export default function PopupWidget() {
 							leave="transition duration-200 transform ease"
 							leaveTo="opacity-0 translate-y-5"
 						>
-							<Disclosure.Panel className=" flex flex-col  overflow-hidden left-0 h-full w-full sm:w-[350px] min-h-[250px] sm:h-[600px] border border-gray-300 dark:border-gray-800 bg-white shadow-2xl rounded-md sm:max-h-[calc(100vh-120px)]">
+							<Disclosure.Panel className=" flex flex-col  overflow-hidden left-0 h-full w-full sm:w-[350px] min-h-[250px]  border border-gray-300 dark:border-gray-800 bg-white shadow-2xl rounded-md sm:max-h-[calc(100vh-120px)]">
 								<div className="flex flex-col items-center justify-center h-32 p-5 bg-indigo-600">
 									<h3 className="text-lg text-white">
 										Was kann ich für Sie tun?
@@ -232,14 +233,18 @@ export default function PopupWidget() {
 													</div>
 												)}
 											</div>
-											<div
-												className="h-captcha h-12"
-												data-sitekey="67c3b64d-8e32-4694-9148-4b6930b8e786"
-											></div>
+
+											<HCaptcha
+												sitekey="67c3b64d-8e32-4694-9148-4b6930b8e786"
+												onVerify={(token, ekey) =>
+													handleVerificationSuccess(token, ekey)
+												}
+											/>
+
 											<div className="mb-3">
 												<button
 													type="submit"
-													className="w-full px-3 py-4 text-white bg-indigo-500 rounded-md focus:bg-indigo-600 focus:outline-none"
+													className="w-full px-3 py-4 mt-4 text-white bg-indigo-500 rounded-md focus:bg-indigo-600 focus:outline-none"
 												>
 													{isSubmitting ? (
 														<svg

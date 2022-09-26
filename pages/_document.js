@@ -42,7 +42,6 @@ class MyDocument extends Document {
 				<body>
 					<Main />
 					<NextScript />
-					<script src="https://js.hcaptcha.com/1/api.js" async defer></script>
 				</body>
 			</Html>
 		);
