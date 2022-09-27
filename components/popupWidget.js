@@ -236,7 +236,7 @@ export default function PopupWidget() {
 											<div className="mb-3">
 												<button
 													type="submit"
-													className="w-full px-3 py-4 mt-4 text-white bg-indigo-500 rounded-md focus:bg-indigo-600 focus:outline-none"
+													className="w-full px-3 py-4 text-white bg-indigo-500 rounded-md focus:bg-indigo-600 focus:outline-none"
 												>
 													{isSubmitting ? (
 														<svg
