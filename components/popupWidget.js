@@ -1,6 +1,9 @@
+// use this one with hcaptcha
+//import React, { useState, useEffect, useRef } from "react";
 import React, { useState } from "react";
 import { useForm, useWatch } from "react-hook-form";
 import { Disclosure, Transition } from "@headlessui/react";
+//import HCaptcha from "@hcaptcha/react-hcaptcha";
 
 export default function PopupWidget() {
 	const {
@@ -120,7 +123,11 @@ export default function PopupWidget() {
 								</div>
 								<div className="flex-grow h-full p-6 overflow-auto bg-gray-50 ">
 									{!isSubmitSuccessful && (
-										<form onSubmit={handleSubmit(onSubmit)} noValidate>
+										<form
+											id="contactformrose"
+											onSubmit={handleSubmit(onSubmit)}
+											noValidate
+										>
 											<input
 												type="hidden"
 												value="6d2dabd5-2ff4-4e7b-b865-b30834fb760b"
@@ -133,7 +140,7 @@ export default function PopupWidget() {
 											/>
 											<input
 												type="hidden"
-												value="Nextly Template"
+												value="rosesblumen.com Website"
 												{...register("from_name")}
 											/>
 											<input
@@ -234,6 +241,10 @@ export default function PopupWidget() {
 											</div>
 
 											<div className="mb-3">
+												<div
+													className="h-captcha"
+													data-sitekey="67c3b64d-8e32-4694-9148-4b6930b8e786"
+												></div>
 												<button
 													type="submit"
 													className="w-full px-3 py-4 text-white bg-indigo-500 rounded-md focus:bg-indigo-600 focus:outline-none"
@@ -287,7 +298,11 @@ export default function PopupWidget() {
 												<h3 className="py-5 text-xl text-green-500">
 													Ihre Nachricht wurde verschickt. Vielen Dank
 												</h3>
-												<p className="text-gray-700 md:px-3">{Message}</p>
+												<p className="text-gray-700 hidden md:px-3">
+													{Message}
+												</p>
+												{/* this is the hcaptcha div */}
+												<div class="h-captcha" data-captcha="true"></div>
 												<button
 													className="mt-6 text-indigo-600 focus:outline-none"
 													onClick={() => reset()}
