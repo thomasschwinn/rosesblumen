@@ -302,7 +302,7 @@ export default function PopupWidget() {
 													{Message}
 												</p>
 												{/* this is the hcaptcha div */}
-												<div class="h-captcha" data-captcha="true"></div>
+
 												<button
 													className="mt-6 text-indigo-600 focus:outline-none"
 													onClick={() => reset()}
