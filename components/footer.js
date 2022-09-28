@@ -86,8 +86,8 @@ export default function Footer() {
 					</div>
 				</div>
 				<div className=" text-sm text-center text-gray-600 dark:text-gray-400 lg:col-span-5">
-					Rose Mwende Schwinn, Franz-Hochedlinger-Gasse 9/8, 1020 wien, +43 699
-					18200580, hallo@rosesblumen.com
+					Rose Mwende Schwinn, Franz-Hochedlinger-Gasse 9/8, 1020 wien, +43 681
+					20654141, hallo@rosesblumen.com
 				</div>
 			</div>
 
