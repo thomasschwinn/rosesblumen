@@ -16,7 +16,7 @@ export default function Hero() {
 						className="w-[48rem] mx-auto mb-16"
 					/>
 					<h2>Frische Blumen</h2>
-					<h3>ab 5. Oktober, mittwochs ab 14 Uhr am Volkertmarkt</h3>
+
 					<h3>freitags und samstags von 8 - 14 Uhr am Karmelitermarkt</h3>
 				</div>
 

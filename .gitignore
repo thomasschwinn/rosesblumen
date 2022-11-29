@@ -32,3 +32,12 @@ yarn-error.log*
 
 # vercel
 .vercel
+public/img/export/fabio.zip
+public/img/export/headshot-fabio-1-2022-11-01.jpg
+public/img/export/headshot-fabio-2-2022-11-01.jpg
+public/img/export/headshot-leo-1-2022-11-01.jpg
+public/img/export/headshot-leo-2-2022-11-01.jpg
+public/img/export/headshot-matthäus-1-2022-11-01.jpg
+public/img/export/headshot-matthäus-2-2022-11-01.jpg
+public/img/export/leo.zip
+public/img/export/matthäus.zip
