@@ -160,7 +160,7 @@ export default function PopupWidget() {
 												<input
 													type="text"
 													id="full_name"
-													placeholder="Maria Leitner"
+													placeholder="Ihr Name"
 													{...register("name", {
 														required: "Bitte geben Sie Ihren Namen ein",
 														maxLength: 80,
@@ -196,7 +196,7 @@ export default function PopupWidget() {
 																"Bitte geben Sie eine richtige Emailadresse ein",
 														},
 													})}
-													placeholder="maria@leitner.at"
+													placeholder="Ihre Emailadresse"
 													className={`w-full px-3 py-2 placeholder-gray-300 bg-white border border-gray-300 rounded-md focus:outline-none focus:ring   ${
 														errors.email
 															? "border-red-600 focus:border-red-600 ring-red-100"
