@@ -29,7 +29,7 @@ export default function Footer() {
 
 					<div className="max-w-md mt-4 text-gray-500 dark:text-gray-400">
 						Rosesblumen ist ein Marktstand mit frischen Schnittblumen am
-						Karmeliter- und am Volkertmarkt in 1020 Wien.
+						Karmelitermarkt in 1020 Wien.
 					</div>
 				</div>
 

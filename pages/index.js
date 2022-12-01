@@ -29,11 +29,11 @@ export default function Home() {
 		<>
 			<Head>
 				<title>
-					Rosesblumen - Frische Schnittblumen am Karmeliter- und am Volkertmarkt
+					Rosesblumen - Frische Schnittblumen am Karmelitermarkt
 				</title>
 				<meta
 					name="description"
-					content="Rosesblumen ist ein Stand mit frischen Schnittblumen. Freitag und Samstag am Karmelitermarkt und am Mittwoch am Volkertmarkt"
+					content="Rosesblumen ist ein Stand mit frischen Schnittblumen. Freitag und Samstag am Karmelitermarkt"
 				/>
 				<link rel="icon" href="/rosesblumen_favicon.png" />
 			</Head>
