@@ -17,10 +17,10 @@ export default function Hero() {
 					/>
 					<h2>Frische Blumen</h2>
 
-					<h3 className="line-through text-gray-400">
+					<h3 className="">
 						freitags und samstags von 8 - 14 Uhr am Karmelitermarkt
 					</h3>
-					<h3>
+					{/* <h3>
 						Ich mache eine Winterpause am Karmelitermarkt von Anfang Dezember
 						bis ca. Ende Januar und bin dann wieder wöchentlich zurück mit
 						frischen Blumen.
@@ -31,7 +31,7 @@ export default function Hero() {
 						Mittwoch möglich.<br></br>
 						<br></br>
 						Meine Telefonnummer lautet 0681 / 20654141
-					</h3>
+					</h3> */}
 				</div>
 
 				<Image layout="responsive" src={standImg}></Image>
