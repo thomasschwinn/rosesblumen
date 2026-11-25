@@ -1,0 +1,100 @@
+---
+import SiteLayout from "@/layouts/SiteLayout.astro";
+import SiteFooter from "@/components/SiteFooter.astro";
+import { Button } from "@/components/ui/button.jsx";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card.jsx";
+import { Input } from "@/components/ui/input.jsx";
+import { Label } from "@/components/ui/label.jsx";
+import { Textarea } from "@/components/ui/textarea.jsx";
+import InstagramFeed from "@/components/InstagramFeed.jsx";
+import instagramData from "@/data/instagram-initial.json";
+---
+
+<SiteLayout>
+	<main class="mx-auto w-full max-w-screen-xl px-6 pt-8 sm:px-10 lg:px-12">
+		<section class="pb-16 pt-2 text-center sm:pb-20">
+			<img
+				src="/img/roses-blumen-logo.svg"
+				alt="Rosesblumen"
+				width="280"
+				height="88"
+				fetchpriority="high"
+				class="mx-auto mb-16 h-auto w-[min(82vw,680px)]"
+			/>
+			<h1 class="text-3xl font-semibold tracking-tight sm:text-4xl">Fresh flowers</h1>
+			<p class="mt-3 text-lg sm:text-xl">From 2021 to 2025 every saturday from 8 am–2 pm at Karmelitermarkt, Vienna/Austria</p>
+		<p class="mt-3 text-lg sm:text-xl">we are now in Nanyuki</p></section>
+
+		<img
+			src="/img/rosesblumen-stand-001.jpg"
+			alt="Rose at her flower stand with fresh-cut flowers at Karmelitermarkt"
+			width="1600"
+			height="998"
+			fetchpriority="high"
+			class="mx-auto h-auto w-full object-cover"
+		/>
+
+		<InstagramFeed
+			profile={instagramData.profile}
+			posts={instagramData.posts}
+			pageSize={instagramData.pageSize}
+			pageCount={instagramData.pageCount}
+			totalPosts={instagramData.totalPosts}
+			client:load
+		/>
+
+		<section id="kontakt" class="mx-auto max-w-3xl scroll-mt-8 px-0 py-20 sm:px-6 lg:py-24">
+			<Card class="overflow-hidden">
+				<CardHeader class="gap-2 pb-4 sm:p-8 sm:pb-5">
+					<p class="text-sm font-semibold uppercase tracking-[0.14em] text-brand">Contact</p>
+					<CardTitle class="text-3xl sm:text-4xl">How can I help you?</CardTitle>
+					<CardDescription class="prose prose-neutral max-w-xl text-base leading-7">
+						<p>Send me a message. I will get back to you as soon as possible.</p>
+					</CardDescription>
+				</CardHeader>
+				<CardContent class="sm:p-8 sm:pt-0">
+					<form action="/api/contact" method="post" class="grid gap-5">
+						<div class="absolute -left-[10000px] top-auto h-px w-px overflow-hidden" aria-hidden="true">
+							<label for="company">Please leave this field empty</label>
+							<input id="company" name="company" tabindex="-1" autocomplete="off" />
+						</div>
+						<div class="grid gap-5 sm:grid-cols-2">
+							<div class="grid gap-2">
+								<Label htmlFor="name">Full name</Label>
+								<Input id="name" name="name" autoComplete="name" placeholder="Your name" required maxLength="80" />
+							</div>
+							<div class="grid gap-2">
+								<Label htmlFor="email">Email address</Label>
+								<Input id="email" name="email" type="email" autoComplete="email" placeholder="you@example.com" required maxLength="254" />
+							</div>
+						</div>
+						<div class="grid gap-2">
+							<Label htmlFor="message">Your message</Label>
+							<Textarea id="message" name="message" placeholder="How can I help?" required minLength="5" maxLength="5000"></Textarea>
+						</div>
+						<div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+							<Button type="submit" class="w-full sm:w-auto">Send message</Button>
+							<p class="text-sm text-muted-foreground">Or call me: <a class="font-medium text-foreground underline underline-offset-4" href="tel:+254112822876">+254 112 822 876</a></p>
+						</div>
+						<p id="contact-status" class="hidden rounded-md bg-muted px-4 py-3 text-sm" role="status" aria-live="polite"></p>
+					</form>
+				</CardContent>
+			</Card>
+		</section>
+	</main>
+
+	<SiteFooter />
+</SiteLayout>
+
+<script>
+	const status = document.querySelector<HTMLElement>("#contact-status");
+	const result = new URLSearchParams(window.location.search).get("contact");
+	if (status && (result === "success" || result === "error")) {
+		status.textContent = result === "success"
+			? "Thank you! Your message has been sent."
+			: "Your message could not be sent. Please try again or call me.";
+		status.classList.remove("hidden");
+		status.classList.toggle("text-red-700", result === "error");
+		if (result === "success") document.querySelector<HTMLFormElement>("#kontakt form")?.reset();
+	}
+</script>
