@@ -7,9 +7,28 @@ interface Props {
 }
 
 const {
-	title = "Rosesblumen – Fresh-Cut Flowers at Karmelitermarkt",
-	description = "Rosesblumen offers fresh-cut flowers every Friday and Saturday at Karmelitermarkt in Vienna.",
+	title = "Rosesblumen | Fresh Cut Flowers in Nanyuki",
+	description = "Rosesblumen offers fresh-cut flowers in Nanyuki, Kenya.",
 } = Astro.props;
+const canonicalUrl = new URL(Astro.url.pathname, Astro.site);
+const shareImage = new URL("/img/rosesblumen-stand-001.jpg", canonicalUrl).href;
+const businessData = {
+	"@context": "https://schema.org",
+	"@type": "Florist",
+	name: "Rosesblumen",
+	url: canonicalUrl.href,
+	image: shareImage,
+	logo: new URL("/img/roses-blumen-logo.svg", canonicalUrl).href,
+	telephone: "+254112822876",
+	address: {
+		"@type": "PostalAddress",
+		streetAddress: "Rosesblumen",
+		addressLocality: "Nanyuki",
+		addressCountry: "KE",
+	},
+	areaServed: "Nanyuki, Kenya",
+	sameAs: ["https://www.instagram.com/rosesblumen/", "https://m.facebook.com/rosesblumen"],
+};
 ---
 
 <!doctype html>
@@ -18,7 +37,27 @@ const {
 		<meta charset="UTF-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
 		<meta name="description" content={description} />
+		<meta name="author" content="Rosesblumen" />
+		<meta name="robots" content="index, follow" />
 		<meta name="theme-color" content="#ffffff" />
+		<link rel="canonical" href={canonicalUrl.href} />
+		<meta property="og:type" content="website" />
+		<meta property="og:site_name" content="Rosesblumen" />
+		<meta property="og:title" content={title} />
+		<meta property="og:description" content={description} />
+		<meta property="og:url" content={canonicalUrl.href} />
+		<meta property="og:locale" content="en_KE" />
+		<meta property="og:image" content={shareImage} />
+		<meta property="og:image:secure_url" content={shareImage} />
+		<meta property="og:image:type" content="image/jpeg" />
+		<meta property="og:image:width" content="1600" />
+		<meta property="og:image:height" content="998" />
+		<meta property="og:image:alt" content="Fresh flowers at the Rosesblumen flower stand" />
+		<meta name="twitter:card" content="summary_large_image" />
+		<meta name="twitter:title" content={title} />
+		<meta name="twitter:description" content={description} />
+		<meta name="twitter:image" content={shareImage} />
+		<meta name="twitter:image:alt" content="Fresh flowers at the Rosesblumen flower stand" />
 		<link rel="icon" type="image/png" href="/rosesblumen_favicon.png" />
 		<link rel="preconnect" href="https://fonts.googleapis.com" />
 		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -27,6 +66,7 @@ const {
 			rel="stylesheet"
 		/>
 		<title>{title}</title>
+		<script type="application/ld+json" set:html={JSON.stringify(businessData)} />
 	</head>
 	<body>
 		<slot />
