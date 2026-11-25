@@ -6,9 +6,10 @@ import {
 	ChevronRight,
 	Heart,
 	Layers2,
+	LoaderCircle,
 	MessageCircle,
 	MoreHorizontal,
-	Play,
+	Pin,
 	Send,
 } from "lucide-react";
 import { Button } from "@/components/ui/button.jsx";
@@ -36,12 +37,14 @@ const captionPreview = (caption, fallback) => {
 const postImage = (post) => post.images?.[0]?.url ?? post.image;
 
 export default function InstagramFeed({ profile, posts: initialPosts, pageCount, totalPosts }) {
-	const [posts, setPosts] = useState(initialPosts);
+	const visibleInitialPosts = initialPosts;
+	const visibleTotalPosts = totalPosts;
+	const [posts, setPosts] = useState(visibleInitialPosts);
 	const [loadedPage, setLoadedPage] = useState(1);
 	const [isLoading, setIsLoading] = useState(false);
 	const [loadError, setLoadError] = useState(false);
 	const [activeIndex, setActiveIndex] = useState(null);
-	const postsRef = useRef(initialPosts);
+	const postsRef = useRef(visibleInitialPosts);
 	const pageRef = useRef(1);
 	const loadingRef = useRef(false);
 	const activeIndexRef = useRef(null);
@@ -201,16 +204,15 @@ export default function InstagramFeed({ profile, posts: initialPosts, pageCount,
 								decoding="async"
 								className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
 							/>
-							{item.mediaType === 2 && (
-								<span className="absolute right-3 top-3 rounded-full bg-black/55 p-2 text-white" aria-label="Video post">
-									<Play size={16} fill="currentColor" aria-hidden="true" />
+							{item.isPinned ? (
+								<span className="absolute right-3 top-3 rounded-full bg-black/55 p-2 text-white" aria-label="Pinned post">
+									<Pin size={16} aria-hidden="true" />
 								</span>
-							)}
-							{item.mediaType === 8 && (
+							) : item.mediaType === 8 ? (
 								<span className="absolute right-3 top-3 rounded-full bg-black/55 p-2 text-white" aria-label="Carousel post">
 									<Layers2 size={16} aria-hidden="true" />
 								</span>
-							)}
+							) : null}
 							<span className="absolute inset-0 flex items-center justify-center bg-black/40 text-sm font-medium text-white opacity-0 transition-opacity group-hover:opacity-100 group-focus-visible:opacity-100">
 								View post
 							</span>
@@ -222,11 +224,12 @@ export default function InstagramFeed({ profile, posts: initialPosts, pageCount,
 
 			<div className="mt-8 flex flex-col items-center gap-3 text-center">
 				<p className="text-sm text-muted-foreground" aria-live="polite">
-					Showing {posts.length} of {totalPosts} posts
+					Showing {posts.length} of {visibleTotalPosts} posts
 				</p>
 				{hasMore && (
 					<Button type="button" variant="outline" onClick={() => void loadNextPage()} disabled={isLoading}>
-						{isLoading ? "Loading posts…" : loadError ? "Try loading again" : `Load ${pageSize} more posts`}
+						{isLoading && <LoaderCircle size={16} className="animate-spin" aria-hidden="true" />}
+						{isLoading ? "Loading photos…" : loadError ? "Try loading again" : `Load ${pageSize} more posts`}
 					</Button>
 				)}
 			</div>

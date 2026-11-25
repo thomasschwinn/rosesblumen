@@ -7,8 +7,8 @@ interface Props {
 }
 
 const {
-	title = "Rosesblumen | Fresh Cut Flowers in Nanyuki",
-	description = "Rosesblumen offers fresh-cut flowers in Nanyuki, Kenya.",
+	title = "Rosesblumen | Fresh Cut Flowers and Bouquetsin Nanyuki",
+	description = "Rosesblumen offers fresh-cut flowers and bouquetsin Nanyuki, Kenya.",
 } = Astro.props;
 const canonicalUrl = new URL(Astro.url.pathname, Astro.site);
 const shareImage = new URL("/img/rosesblumen-stand-001.jpg", canonicalUrl).href;
@@ -37,7 +37,7 @@ const businessData = {
 		<meta charset="UTF-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
 		<meta name="description" content={description} />
-		<meta name="author" content="Rosesblumen" />
+		<meta name="author" content="Thomas Schwinn" />
 		<meta name="robots" content="index, follow" />
 		<meta name="theme-color" content="#ffffff" />
 		<link rel="canonical" href={canonicalUrl.href} />
