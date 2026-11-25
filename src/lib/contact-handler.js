@@ -65,8 +65,10 @@ export async function handleContact(request) {
 			text: `Name: ${name}\nEmail: ${email}\n\n${message}`,
 			html: `<h2>New contact request</h2><p><strong>Name:</strong> ${safeName}</p><p><strong>Email:</strong> ${safeEmail}</p><p>${safeMessage}</p>`,
 		});
+		if (error) console.error("Resend contact email failed:", error.message);
 		return redirect(error ? "error" : "success");
-	} catch {
+	} catch (error) {
+		console.error("Contact form send failed:", error instanceof Error ? error.message : "Unknown error");
 		return redirect("error");
 	}
 }

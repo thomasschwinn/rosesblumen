@@ -53,7 +53,19 @@ import instagramData from "@/data/instagram-initial.json";
 					</CardDescription>
 				</CardHeader>
 				<CardContent class="sm:p-8 sm:pt-0">
-					<form action="/api/contact" method="post" class="grid gap-5">
+					<div id="contact-success" class="hidden rounded-xl bg-emerald-50 px-6 py-10 text-center ring-1 ring-emerald-200" role="status" aria-live="polite">
+						<div class="mx-auto grid size-16 place-items-center rounded-full bg-emerald-100 text-emerald-700">
+							<svg viewBox="0 0 24 24" width="34" height="34" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+								<path d="m5 12 4 4L19 6" />
+							</svg>
+						</div>
+						<h3 class="mt-5 text-2xl font-semibold text-emerald-950">Thank you!</h3>
+						<p class="mx-auto mt-2 max-w-md leading-7 text-emerald-900">Thank you for reaching out. We’ll get back to you as soon as we can.</p>
+					</div>
+					<p id="contact-error" class="hidden rounded-md bg-red-50 px-4 py-3 text-sm text-red-800 ring-1 ring-red-200" role="alert" aria-live="assertive">
+						Your message could not be sent. Please try again or call me at <a class="font-medium underline underline-offset-4" href="tel:+254112822876">+254 112 822 876</a>.
+					</p>
+					<form id="contact-form" action="/api/contact" method="post" class="grid gap-5">
 						<div class="absolute -left-[10000px] top-auto h-px w-px overflow-hidden" aria-hidden="true">
 							<label for="company">Please leave this field empty</label>
 							<input id="company" name="company" tabindex="-1" autocomplete="off" />
@@ -76,7 +88,6 @@ import instagramData from "@/data/instagram-initial.json";
 							<Button type="submit" class="w-full sm:w-auto">Send message</Button>
 							<p class="text-sm text-muted-foreground">Or call me: <a class="font-medium text-foreground underline underline-offset-4" href="tel:+254112822876">+254 112 822 876</a></p>
 						</div>
-						<p id="contact-status" class="hidden rounded-md bg-muted px-4 py-3 text-sm" role="status" aria-live="polite"></p>
 					</form>
 				</CardContent>
 			</Card>
@@ -87,14 +98,43 @@ import instagramData from "@/data/instagram-initial.json";
 </SiteLayout>
 
 <script>
-	const status = document.querySelector<HTMLElement>("#contact-status");
+	const form = document.querySelector<HTMLFormElement>("#contact-form");
+	const success = document.querySelector<HTMLElement>("#contact-success");
+	const error = document.querySelector<HTMLElement>("#contact-error");
 	const result = new URLSearchParams(window.location.search).get("contact");
-	if (status && (result === "success" || result === "error")) {
-		status.textContent = result === "success"
-			? "Thank you! Your message has been sent."
-			: "Your message could not be sent. Please try again or call me.";
-		status.classList.remove("hidden");
-		status.classList.toggle("text-red-700", result === "error");
-		if (result === "success") document.querySelector<HTMLFormElement>("#kontakt form")?.reset();
+	if (result === "success") {
+		form?.classList.add("hidden");
+		success?.classList.remove("hidden");
+	} else if (result === "error") {
+		error?.classList.remove("hidden");
 	}
+
+	form?.addEventListener("submit", async (event) => {
+		event.preventDefault();
+		const submitButton = form.querySelector<HTMLButtonElement>('button[type="submit"]');
+		if (submitButton) {
+			submitButton.disabled = true;
+			submitButton.textContent = "Sending…";
+		}
+		error?.classList.add("hidden");
+
+		try {
+			const response = await fetch(form.action, {
+				method: form.method,
+				body: new FormData(form),
+				redirect: "follow",
+			});
+			const status = new URL(response.url).searchParams.get("contact");
+			if (!response.ok || status !== "success") throw new Error("Contact submission failed");
+			form.classList.add("hidden");
+			success?.classList.remove("hidden");
+		} catch {
+			error?.classList.remove("hidden");
+		} finally {
+			if (submitButton && !form.classList.contains("hidden")) {
+				submitButton.disabled = false;
+				submitButton.textContent = "Send message";
+			}
+		}
+	});
 </script>

@@ -45,6 +45,8 @@ export default function InstagramFeed({ profile, posts: initialPosts, pageCount,
 	const pageRef = useRef(1);
 	const loadingRef = useRef(false);
 	const activeIndexRef = useRef(null);
+	const pauseAutoLoadRef = useRef(false);
+	const requestControllerRef = useRef(null);
 	const sentinelRef = useRef(null);
 	const post = activeIndex === null ? null : posts[activeIndex];
 	const hasMore = loadedPage < pageCount;
@@ -54,15 +56,18 @@ export default function InstagramFeed({ profile, posts: initialPosts, pageCount,
 		setActiveIndex(index);
 	};
 
-	const loadNextPage = useCallback(async () => {
+	const loadNextPage = useCallback(async ({ automatic = false } = {}) => {
+		if (automatic && pauseAutoLoadRef.current) return null;
 		if (loadingRef.current || pageRef.current >= pageCount) return null;
 		loadingRef.current = true;
 		setIsLoading(true);
 		setLoadError(false);
+		const controller = new AbortController();
+		requestControllerRef.current = controller;
 		const nextPage = pageRef.current + 1;
 		const pageNumber = String(nextPage).padStart(3, "0");
 		try {
-			const response = await fetch(`${import.meta.env.BASE_URL}instagram-feed/pages/page-${pageNumber}.json`);
+			const response = await fetch(`${import.meta.env.BASE_URL}instagram-feed/pages/page-${pageNumber}.json`, { signal: controller.signal });
 			if (!response.ok) throw new Error(`Feed page request failed with ${response.status}`);
 			const data = await response.json();
 			const addedPosts = Array.isArray(data.posts) ? data.posts : [];
@@ -71,21 +76,50 @@ export default function InstagramFeed({ profile, posts: initialPosts, pageCount,
 			setPosts(postsRef.current);
 			setLoadedPage(nextPage);
 			return addedPosts;
-		} catch {
-			setLoadError(true);
+		} catch (error) {
+			if (error.name !== "AbortError") setLoadError(true);
 			return null;
 		} finally {
+			if (requestControllerRef.current === controller) requestControllerRef.current = null;
 			loadingRef.current = false;
 			setIsLoading(false);
 		}
 	}, [pageCount]);
 
 	useEffect(() => {
+		const returningFromContact = new URLSearchParams(window.location.search).has("contact");
+		if (returningFromContact) pauseAutoLoadRef.current = true;
+
+		const pauseForContactClick = (event) => {
+			if (event.target instanceof Element && event.target.closest("[data-contact-jump]")) {
+				pauseAutoLoadRef.current = true;
+				requestControllerRef.current?.abort();
+			}
+		};
+		document.addEventListener("click", pauseForContactClick, true);
+
+		const contactSection = document.getElementById("kontakt");
+		const contactObserver = contactSection && "IntersectionObserver" in window
+			? new IntersectionObserver(([entry]) => {
+					if (entry.isIntersecting && !returningFromContact) {
+						pauseAutoLoadRef.current = false;
+					}
+				})
+			: null;
+		if (contactObserver) contactObserver.observe(contactSection);
+
+		return () => {
+			document.removeEventListener("click", pauseForContactClick, true);
+			contactObserver?.disconnect();
+		};
+	}, []);
+
+	useEffect(() => {
 		const sentinel = sentinelRef.current;
 		if (!sentinel || !hasMore || !("IntersectionObserver" in window)) return undefined;
 		const observer = new IntersectionObserver(
 			([entry]) => {
-				if (entry.isIntersecting) void loadNextPage();
+				if (entry.isIntersecting) void loadNextPage({ automatic: true });
 			},
 			{ rootMargin: "320px 0px" },
 		);
