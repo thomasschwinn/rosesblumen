@@ -84,6 +84,13 @@ import instagramData from "@/data/instagram-initial.json";
 							<Label htmlFor="message">Your message</Label>
 							<Textarea id="message" name="message" placeholder="How can I help?" required minLength="5" maxLength="5000"></Textarea>
 						</div>
+						{import.meta.env.PUBLIC_TURNSTILE_SITE_KEY ? (
+							<div class="min-h-[65px]">
+								<div class="cf-turnstile" data-sitekey={import.meta.env.PUBLIC_TURNSTILE_SITE_KEY} data-theme="auto" data-size="flexible"></div>
+							</div>
+						) : (
+							<p class="text-sm text-muted-foreground">The security check is not configured yet. Please call us instead.</p>
+						)}
 						<div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
 							<Button type="submit" class="w-full sm:w-auto">Send message</Button>
 							<p class="text-sm text-muted-foreground">Or call me: <a class="font-medium text-foreground underline underline-offset-4" href="tel:+254112822876">+254 112 822 876</a></p>
@@ -96,6 +103,8 @@ import instagramData from "@/data/instagram-initial.json";
 
 	<SiteFooter />
 </SiteLayout>
+
+{import.meta.env.PUBLIC_TURNSTILE_SITE_KEY && <script is:inline src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>}
 
 <script>
 	const form = document.querySelector<HTMLFormElement>("#contact-form");
@@ -111,6 +120,11 @@ import instagramData from "@/data/instagram-initial.json";
 
 	form?.addEventListener("submit", async (event) => {
 		event.preventDefault();
+		const formData = new FormData(form);
+		if (!formData.get("cf-turnstile-response")) {
+			error?.classList.remove("hidden");
+			return;
+		}
 		const submitButton = form.querySelector<HTMLButtonElement>('button[type="submit"]');
 		if (submitButton) {
 			submitButton.disabled = true;
@@ -121,7 +135,7 @@ import instagramData from "@/data/instagram-initial.json";
 		try {
 			const response = await fetch(form.action, {
 				method: form.method,
-				body: new FormData(form),
+				body: formData,
 				redirect: "follow",
 			});
 			const status = new URL(response.url).searchParams.get("contact");

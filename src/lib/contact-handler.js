@@ -16,6 +16,23 @@ const redirect = (status) => new Response(null, {
 	},
 });
 
+async function verifyTurnstile(token, secret) {
+	if (!token || !secret) return false;
+
+	try {
+		const response = await fetch("https://challenges.cloudflare.com/turnstile/v0/siteverify", {
+			method: "POST",
+			headers: { "Content-Type": "application/x-www-form-urlencoded" },
+			body: new URLSearchParams({ secret, response: token }),
+		});
+		if (!response.ok) return false;
+		const result = await response.json();
+		return result.success === true;
+	} catch {
+		return false;
+	}
+}
+
 export async function handleContact(request) {
 	if (request.method !== "POST") {
 		return new Response("Method not allowed", {
@@ -45,6 +62,9 @@ export async function handleContact(request) {
 		!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) || email.length > 254 ||
 		message.length < 5 || message.length > 5000
 	) return redirect("error");
+
+	const turnstileSecret = process.env.TURNSTILE_SECRET_KEY;
+	if (!await verifyTurnstile(value("cf-turnstile-response"), turnstileSecret)) return redirect("error");
 
 	const apiKey = process.env.RESEND_API_KEY;
 	const from = process.env.RESEND_FROM_EMAIL;

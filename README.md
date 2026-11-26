@@ -13,7 +13,7 @@ npm run dev
 
 Open <http://localhost:4321> for the Astro development server.
 
-To test the Resend form locally, create `.env` from `.env.example`, add your Resend credentials, then run:
+To run the contact form locally, copy `.env.example` to `.env`, add your Resend credentials and Turnstile keys, then run:
 
 ```sh
 npm run build
@@ -26,19 +26,21 @@ The production server runs at <http://localhost:4321> and serves the static buil
 RESEND_API_KEY=re_...
 RESEND_FROM_EMAIL=Rosesblumen <kontakt@your-verified-domain.example>
 CONTACT_TO_EMAIL=hallo@rosesblumen.com
+PUBLIC_TURNSTILE_SITE_KEY=your-turnstile-site-key
+TURNSTILE_SECRET_KEY=your-turnstile-secret-key
 ```
 
-Verify the sender domain in Resend. Keep the API key on the server and never expose it in a `PUBLIC_` variable.
+Verify the sender domain in Resend. `PUBLIC_TURNSTILE_SITE_KEY` is public and is embedded in the page at build time. Keep `TURNSTILE_SECRET_KEY` and `RESEND_API_KEY` private server-side values; never use a `PUBLIC_` prefix for either secret.
 
 ## Deploy
 
 ### VPS
 
-Install Node.js 22 or newer, run `npm ci && npm run build`, set the three environment variables above, then run `npm start` under a process manager such as systemd or PM2. The server listens on `PORT` (4321 by default) and can sit behind a reverse proxy such as Nginx.
+Install Node.js 22 or newer, set all five environment variables above, run `npm ci && npm run build`, then run `npm start` under a process manager such as systemd or PM2. The server listens on `PORT` (4321 by default) and can sit behind a reverse proxy such as Nginx.
 
 ### Vercel
 
-Import the repository into Vercel. It builds the Astro site into `dist/` and the API function from `api/contact.js`. Add `RESEND_API_KEY`, `RESEND_FROM_EMAIL`, and optionally `CONTACT_TO_EMAIL` to the project environment variables.
+Import the repository into Vercel. It builds the Astro site into `dist/` and the API function from `api/contact.js`. Add `PUBLIC_TURNSTILE_SITE_KEY`, `TURNSTILE_SECRET_KEY`, `RESEND_API_KEY`, `RESEND_FROM_EMAIL`, and optionally `CONTACT_TO_EMAIL` to the project environment variables. The site key must be available during the build; the secret keys are used by the server function.
 
 ## shadcn/ui
 
