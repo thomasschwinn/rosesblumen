@@ -4,6 +4,8 @@ Static Astro website for Rosesblumen, styled with Tailwind CSS, shadcn/ui, and t
 
 all images and video are on uploadthing, project rosesblumen
 
+emails send with resend
+
 ## Local development
 
 ```sh
@@ -12,6 +14,8 @@ npm run dev
 ```
 
 Open <http://localhost:4321> for the Astro development server.
+
+**Turnstile note:** The current Turnstile widget does not work on the local development hostname. Contact form submissions that require Turnstile can therefore only be completed on Vercel until a separate local widget is configured.
 
 To run the contact form locally, copy `.env.example` to `.env`, add your Resend credentials and Turnstile keys, then run:
 
