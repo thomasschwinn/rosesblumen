@@ -1,16 +1,13 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import {
-	Bookmark,
 	Camera,
 	ChevronLeft,
 	ChevronRight,
 	Heart,
 	Layers2,
 	LoaderCircle,
-	MessageCircle,
-	MoreHorizontal,
 	Pin,
-	Send,
+	Play,
 } from "lucide-react";
 import { Button } from "@/components/ui/button.jsx";
 import {
@@ -36,6 +33,60 @@ const captionPreview = (caption, fallback) => {
 
 const postImage = (post) => post.images?.[0]?.url ?? post.image;
 
+function InstagramPostTile({ item, onClick, label }) {
+	const [imageLoaded, setImageLoaded] = useState(false);
+	const imageRef = useRef(null);
+	const src = postImage(item);
+
+	useEffect(() => {
+		if (imageRef.current?.complete) setImageLoaded(true);
+	}, [src]);
+
+	return (
+		<button
+			type="button"
+			onClick={onClick}
+			aria-label={label}
+			className="group relative block aspect-square overflow-hidden bg-muted text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2"
+		>
+			<img
+				ref={imageRef}
+				src={src}
+				alt={captionPreview(item.caption, `Flowers${item.location ? ` at ${item.location}` : ""}`)}
+				width={item.images?.[0]?.width ?? 640}
+				height={item.images?.[0]?.height ?? 640}
+				loading="lazy"
+				decoding="async"
+				onLoad={() => setImageLoaded(true)}
+				onError={() => setImageLoaded(true)}
+				className={`h-full w-full object-cover transition-[opacity,transform] duration-300 group-hover:scale-105 ${imageLoaded ? "opacity-100" : "opacity-0"}`}
+			/>
+			{!imageLoaded && (
+				<span className="absolute inset-0 z-20 grid place-items-center text-brand" role="status" aria-label="Loading photo">
+					<LoaderCircle size={28} className="animate-spin" aria-hidden="true" />
+				</span>
+			)}
+			{item.isPinned && (
+				<span className={`absolute ${item.videos?.length ? "left-3" : "right-3"} top-3 z-10 rounded-full bg-black/55 p-2 text-white`} aria-label="Pinned post">
+					<Pin size={16} aria-hidden="true" />
+				</span>
+			)}
+			{item.videos?.length ? (
+				<span className="absolute right-3 top-3 z-10 rounded-full bg-black/55 p-2 text-white" aria-label="Video post">
+					<Play size={16} fill="currentColor" aria-hidden="true" />
+				</span>
+			) : !item.isPinned && item.mediaType === 8 ? (
+				<span className="absolute right-3 top-3 z-10 rounded-full bg-black/55 p-2 text-white" aria-label="Carousel post">
+					<Layers2 size={16} aria-hidden="true" />
+				</span>
+			) : null}
+			<span className="absolute inset-0 z-10 flex items-center justify-center bg-black/40 text-sm font-medium text-white opacity-0 transition-opacity group-hover:opacity-100 group-focus-visible:opacity-100">
+				View post
+			</span>
+		</button>
+	);
+}
+
 export default function InstagramFeed({ profile, posts: initialPosts, pageCount, totalPosts }) {
 	const visibleInitialPosts = initialPosts;
 	const visibleTotalPosts = totalPosts;
@@ -51,8 +102,17 @@ export default function InstagramFeed({ profile, posts: initialPosts, pageCount,
 	const pauseAutoLoadRef = useRef(false);
 	const requestControllerRef = useRef(null);
 	const sentinelRef = useRef(null);
+	const videoRef = useRef(null);
+	const [loadedVideoUrl, setLoadedVideoUrl] = useState(null);
 	const post = activeIndex === null ? null : posts[activeIndex];
+	const videoUrl = post?.videos?.[0]?.url;
+	const isVideoLoading = Boolean(videoUrl) && loadedVideoUrl !== videoUrl;
 	const hasMore = loadedPage < pageCount;
+
+	useEffect(() => {
+		setLoadedVideoUrl(null);
+		if (videoRef.current?.readyState >= 2) setLoadedVideoUrl(videoUrl);
+	}, [videoUrl]);
 
 	const setActive = (index) => {
 		activeIndexRef.current = index;
@@ -186,37 +246,13 @@ export default function InstagramFeed({ profile, posts: initialPosts, pageCount,
 
 			<div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
 				{posts.map((item, index) => {
-					const src = postImage(item);
 					return (
-						<button
+						<InstagramPostTile
 							key={item.code}
-							type="button"
+							item={item}
 							onClick={() => setActive(index)}
-							aria-label={`Open Instagram post: ${captionPreview(item.caption, item.location || "Flowers")}`}
-							className="group relative block aspect-square overflow-hidden bg-muted text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2"
-						>
-							<img
-								src={src}
-								alt={captionPreview(item.caption, `Flowers${item.location ? ` at ${item.location}` : ""}`)}
-								width={item.images?.[0]?.width ?? 640}
-								height={item.images?.[0]?.height ?? 640}
-								loading="lazy"
-								decoding="async"
-								className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
-							/>
-							{item.isPinned ? (
-								<span className="absolute right-3 top-3 rounded-full bg-black/55 p-2 text-white" aria-label="Pinned post">
-									<Pin size={16} aria-hidden="true" />
-								</span>
-							) : item.mediaType === 8 ? (
-								<span className="absolute right-3 top-3 rounded-full bg-black/55 p-2 text-white" aria-label="Carousel post">
-									<Layers2 size={16} aria-hidden="true" />
-								</span>
-							) : null}
-							<span className="absolute inset-0 flex items-center justify-center bg-black/40 text-sm font-medium text-white opacity-0 transition-opacity group-hover:opacity-100 group-focus-visible:opacity-100">
-								View post
-							</span>
-						</button>
+							label={`Open Instagram post: ${captionPreview(item.caption, item.location || "Flowers")}`}
+						/>
 					);
 				})}
 				{hasMore && <div ref={sentinelRef} className="col-span-full h-1" aria-hidden="true" />}
@@ -236,7 +272,10 @@ export default function InstagramFeed({ profile, posts: initialPosts, pageCount,
 
 			<Dialog open={activeIndex !== null} onOpenChange={(open) => !open && setActive(null)}>
 				{post && (
-					<DialogContent className="w-[calc(100vw-1rem)] max-w-[calc(100vw-1rem)] overflow-hidden border-0 bg-white p-0 text-[#262626] shadow-2xl sm:w-[calc(100vw-3rem)] sm:max-w-5xl">
+					<DialogContent
+						closeButtonClassName="right-3 top-3 z-50 grid size-11 place-items-center rounded-full bg-white/95 text-zinc-900 opacity-100 shadow-lg ring-1 ring-black/20 hover:bg-white focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 [&_svg]:size-5"
+						className="w-[calc(100vw-1rem)] max-w-[calc(100vw-1rem)] overflow-hidden border-0 bg-white p-0 text-[#262626] shadow-2xl sm:w-[calc(100vw-3rem)] sm:max-w-5xl"
+					>
 						<DialogTitle className="sr-only">Post by @{profile.username}</DialogTitle>
 						<DialogDescription className="sr-only">
 							Use the left and right arrow keys to browse posts. Press Escape to close.
@@ -244,11 +283,37 @@ export default function InstagramFeed({ profile, posts: initialPosts, pageCount,
 
 						<div className="grid h-[calc(100dvh-1rem)] max-h-[860px] grid-rows-[auto_minmax(0,1fr)] overflow-hidden md:h-[min(82vh,860px)] md:grid-cols-[minmax(0,1fr)_360px] md:grid-rows-1">
 							<div className="relative flex aspect-square min-h-0 items-center justify-center bg-black md:aspect-auto md:min-h-0">
-								<img
-									src={postImage(post)}
-									alt={captionPreview(post.caption, `Flowers${post.location ? ` at ${post.location}` : ""}`)}
-									className="h-full w-full object-contain"
-								/>
+								{videoUrl ? (
+									<>
+										<video
+											key={videoUrl}
+											ref={videoRef}
+											src={videoUrl}
+											controls
+											playsInline
+											preload="metadata"
+											autoPlay
+											muted
+											aria-label={`Video from post by @${profile.username}`}
+											onLoadedData={() => setLoadedVideoUrl(videoUrl)}
+											onError={() => setLoadedVideoUrl(videoUrl)}
+											className="h-full w-full object-contain"
+										>
+											Your browser does not support video playback.
+										</video>
+										{isVideoLoading && (
+											<span className="absolute inset-0 z-10 grid place-items-center text-white" role="status" aria-label="Loading video">
+												<LoaderCircle size={40} className="animate-spin" aria-hidden="true" />
+											</span>
+										)}
+									</>
+								) : (
+									<img
+										src={postImage(post)}
+										alt={captionPreview(post.caption, `Flowers${post.location ? ` at ${post.location}` : ""}`)}
+										className="h-full w-full object-contain"
+									/>
+								)}
 								<button
 									type="button"
 									onClick={showPrevious}
@@ -270,23 +335,6 @@ export default function InstagramFeed({ profile, posts: initialPosts, pageCount,
 							</div>
 
 							<aside className="flex min-h-0 flex-col border-t border-[#efefef] md:border-l md:border-t-0">
-								<header className="flex items-center gap-3 border-b border-[#efefef] px-4 py-3">
-									<img src={profile.image} alt="" className="size-8 rounded-full object-cover" />
-									<div className="min-w-0 flex-1 leading-tight">
-										<p className="truncate text-sm font-semibold">{profile.username}</p>
-										<p className="truncate text-xs text-muted-foreground">{post.location}</p>
-									</div>
-									<a
-										href={`https://www.instagram.com/p/${post.code}/`}
-										target="_blank"
-										rel="noreferrer"
-										aria-label="Open original post on Instagram"
-										className="rounded-full p-2 hover:bg-[#f5f5f5]"
-									>
-										<MoreHorizontal size={20} aria-hidden="true" />
-									</a>
-								</header>
-
 								<div className="min-h-0 flex-1 overflow-y-auto px-4 py-4">
 									<div className="flex items-start gap-3">
 										<img src={profile.image} alt="" className="size-8 shrink-0 rounded-full object-cover" />
@@ -313,9 +361,6 @@ export default function InstagramFeed({ profile, posts: initialPosts, pageCount,
 								<footer className="border-t border-[#efefef] px-4 py-3">
 									<div className="mb-3 flex items-center gap-4">
 										<Heart size={24} aria-hidden="true" />
-										<MessageCircle size={24} className="-rotate-12" aria-hidden="true" />
-										<Send size={23} aria-hidden="true" />
-										<Bookmark size={23} className="ml-auto" aria-hidden="true" />
 									</div>
 									<p className="text-sm font-semibold">{post.likes.toLocaleString("en-US")} likes</p>
 									<time dateTime={post.date} className="mt-1 block text-[10px] uppercase tracking-wide text-muted-foreground">

@@ -2,6 +2,8 @@
 
 Static Astro website for Rosesblumen, styled with Tailwind CSS, shadcn/ui, and the Typography plugin.
 
+all images and video are on uploadthing, project rosesblumen
+
 ## Local development
 
 ```sh

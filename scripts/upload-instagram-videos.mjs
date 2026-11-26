@@ -8,7 +8,7 @@ const feedPath = path.join(root, "public", "instagram-feed.json");
 const pageDirectory = path.join(root, "public", "instagram-feed", "pages");
 const initialPath = path.join(root, "src", "data", "instagram-initial.json");
 const manifestPath = path.join(root, "public", "instagram-videos-manifest.json");
-const batchSize = 8;
+const batchSize = 1;
 
 const source = JSON.parse(await readFile(feedPath, "utf8"));
 const bySourcePath = new Map();
@@ -100,7 +100,8 @@ while (remoteHasMore) {
 
 const manifestByCustomId = new Map(manifest.map((asset) => [asset.customId, asset]));
 for (const remoteFile of remoteFiles) {
-	const asset = assetByCustomId.get(remoteFile.customId);
+	const asset = assetByCustomId.get(remoteFile.customId)
+		?? assets.find((candidate) => remoteFile.customId?.startsWith(`${candidate.customId}-retry-`));
 	if (!asset || remoteFile.status !== "Uploaded") continue;
 	const uploadedUrl = `https://${parsedToken.appId}.ufs.sh/f/${remoteFile.key}`;
 	manifestByCustomId.set(asset.customId, {
@@ -117,6 +118,8 @@ await writeFile(manifestPath, `${JSON.stringify(manifest, null, 2)}\n`);
 const remoteStatusByCustomId = new Map(remoteFiles.map((file) => [file.customId, file.status]));
 for (const asset of assets) {
 	if (remoteStatusByCustomId.get(asset.customId) !== "Uploading") continue;
+	const startedAt = remoteFiles.find((file) => file.customId === asset.customId)?.uploadedAt ?? Date.now();
+	if (Date.now() - startedAt > 5 * 60_000) continue;
 	console.log(`Waiting for ${asset.name} to finish its existing UploadThing transfer.`);
 	for (let attempt = 0; attempt < 2; attempt += 1) {
 		await new Promise((resolve) => setTimeout(resolve, 20_000));
@@ -144,26 +147,30 @@ for (const asset of assets) {
 
 const pending = assets.filter((asset) =>
 	!uploadedPaths.has(asset.sourcePath) &&
-	!(["Uploaded", "Uploading"].includes(remoteStatusByCustomId.get(asset.customId))),
-);
-const stillUploading = assets.filter((asset) => remoteStatusByCustomId.get(asset.customId) === "Uploading");
+	remoteStatusByCustomId.get(asset.customId) !== "Uploaded",
+).map((asset) => {
+	const active = remoteFiles.find((file) => file.customId === asset.customId && file.status === "Uploading");
+	if (!active) return { ...asset, uploadName: asset.name, uploadCustomId: asset.customId };
+	const retryNumber = remoteFiles.filter((file) => file.customId?.startsWith(`${asset.customId}-retry-`)).length + 1;
+	return { ...asset, uploadName: asset.name.replace(/\.mp4$/i, `-retry-${retryNumber}.mp4`), uploadCustomId: `${asset.customId}-retry-${retryNumber}` };
+});const stillUploading = assets.filter((asset) => remoteStatusByCustomId.get(asset.customId) === "Uploading");
 console.log(`UploadThing already has ${assets.length - pending.length} of ${assets.length} videos.`);
 if (stillUploading.length) {
-	console.log(`Leaving ${stillUploading.length} in-progress video(s) alone to avoid duplicate uploads: ${stillUploading.map((asset) => asset.name).join(", ")}`);
+	console.log(`Retrying ${stillUploading.length} stale in-progress video(s) with distinct identifiers: ${stillUploading.map((asset) => asset.name).join(", ")}`);
 }
 
 for (let index = 0; index < pending.length; index += batchSize) {
 	const batch = pending.slice(index, index + batchSize);
 	const results = await utapi.uploadFilesFromUrl(
-		batch.map(({ sourceUrl, name, customId }) => ({ url: sourceUrl, name, customId })),
-		{ concurrency: 4 },
+		batch.map(({ sourceUrl, uploadName, uploadCustomId }) => ({ url: sourceUrl, name: uploadName, customId: uploadCustomId })),
+		{ concurrency: 1 },
 	);
 	for (let resultIndex = 0; resultIndex < results.length; resultIndex += 1) {
 		const result = results[resultIndex];
 		const asset = batch[resultIndex];
 		if (result.error || !result.data) {
 			failedCount += 1;
-			console.error(`Failed ${asset.name}: ${result.error?.message ?? "Upload failed"}`);
+			console.error(`Failed ${asset.uploadName}: ${result.error?.message ?? "Upload failed"}`);
 			continue;
 		}
 		manifestByCustomId.set(asset.customId, {
@@ -174,7 +181,7 @@ for (let index = 0; index < pending.length; index += batchSize) {
 			bytes: result.data.size,
 		});
 		manifest = [...manifestByCustomId.values()];
-		console.log(`Uploaded ${asset.name} (${Math.min(index + resultIndex + 1, pending.length)}/${pending.length})`);
+		console.log(`Uploaded ${asset.uploadName} (${Math.min(index + resultIndex + 1, pending.length)}/${pending.length})`);
 	}
 	await writeFile(manifestPath, `${JSON.stringify(manifest, null, 2)}\n`);
 }
